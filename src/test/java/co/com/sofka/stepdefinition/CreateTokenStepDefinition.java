@@ -7,6 +7,7 @@ import io.cucumber.java.es.Entonces;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
+import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 
 import static io.restassured.RestAssured.given;
@@ -14,6 +15,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class CreateTokenStepDefinition extends Setup {
 
+    private static final Logger LOGGER = Logger.getLogger(CreateTokenStepDefinition.class);
     private RequestSpecification request;
 
     private Response response;
@@ -31,8 +33,7 @@ public class CreateTokenStepDefinition extends Setup {
                     "}");
         } catch (Exception e) {
             Assertions.fail(e.getMessage());
-            //logger...
-            System.out.println(e.getMessage());
+            LOGGER.error(e.getMessage(),e);
         }
     }
 
@@ -45,7 +46,7 @@ public class CreateTokenStepDefinition extends Setup {
                     .post();
         } catch (Exception e){
             Assertions.fail(e.getMessage());
-            //logger
+            LOGGER.error(e.getMessage(),e);
         }
 
     }
@@ -61,7 +62,7 @@ public class CreateTokenStepDefinition extends Setup {
                     .body("token",notNullValue());
         }catch (Exception e){
             Assertions.fail(e.getMessage());
-            //logger
+            LOGGER.error(e.getMessage(),e);
         }
     }
 }
