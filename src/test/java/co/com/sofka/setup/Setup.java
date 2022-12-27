@@ -7,9 +7,6 @@ import org.apache.log4j.PropertyConfigurator;
 
 public class Setup {
     protected static final String BASE_URL = "https://restful-booker.herokuapp.com";
-    protected static final String BASE_PATH = "/auth";
-
-    //protected static final String RESOURCE = "/";
 
     protected void generalSetUp(){
         configurationForRestAssured();
@@ -18,7 +15,6 @@ public class Setup {
 
     public void configurationForRestAssured(){
         RestAssured.baseURI = BASE_URL;
-        RestAssured.basePath = BASE_PATH;
         RestAssured.requestSpecification = new RequestSpecBuilder()
                 .setContentType(ContentType.JSON)
                 .build();

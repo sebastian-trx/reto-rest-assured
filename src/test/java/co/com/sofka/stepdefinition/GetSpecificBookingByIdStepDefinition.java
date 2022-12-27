@@ -10,65 +10,60 @@ import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.hasLength;
+import static io.restassured.RestAssured.given;
 
-public class CreateTokenStepDefinition extends Setup {
+public class GetSpecificBookingByIdStepDefinition extends Setup {
 
-    private static final Logger LOGGER = Logger.getLogger(CreateTokenStepDefinition.class);
+    private static final Logger LOGGER = Logger.getLogger(GetSpecificBookingByIdStepDefinition.class);
+
     private RequestSpecification request;
 
     private Response response;
-
-    @Dado("que el usuario posee un username: {string} y password: {string}")
-    public void queElUsuarioUsernameYPassword(String username, String password) {
+    @Dado("que el usuario posee un id de una reserva existente")
+    public void queElUsuarioPoseeUnIdDeUnaReservaExistente() {
         try {
             generalSetUp();
             request = given()
                     .log()
-                    .all()
-                    .body("{\n" +
-                    "   \"username\": \"admin\", \n" +
-                    "   \"password\": \"password123\"\n"+
-                    "}");
+                    .all();
         } catch (Exception e) {
             Assertions.fail(e.getMessage());
             LOGGER.error(e.getMessage(),e);
         }
     }
 
-    @Cuando("el usuario realiza una peticion para crear un token de autorizacion")
-    public void elUsuarioRealizaUnaPeticionParaCrearUnTokenDeAutorizacion() {
+    @Cuando("el usuario realiza una peticion para obtener la informacion de una reserva id = {int}")
+    public void elUsuarioRealizaUnaPeticionParaObtenerLaInformacionDeUnaReservaId(int id) {
         try{
             response = request.when()
                     .log()
                     .all()
-                    .post("/auth");
+                    .get("/booking/{id}",id);
         } catch (Exception e){
             Assertions.fail(e.getMessage());
             LOGGER.error(e.getMessage(),e);
         }
-
     }
 
-    @Entonces("el sistema responde con un status code exitoso y un token de autorizacion")
-    public void elSistemaRespondeConUnStatusCodeExitosoYUnTokenDeAutorizacion() {
+    @Entonces("el sistema responde con un status code exitoso y la informacion de la reserva en formato JSON")
+    public void elSistemaRespondeConUnStatusCodeExitosoYLaInformacionDeLaReservaEnFormatoJSON() {
         try{
             response
                     .then()
                     .log()
                     .all()
                     .statusCode(HttpStatus.SC_OK)
-                    .body("token",hasLength(15))
-                    .body("token",notNullValue())
-                    .header("Content-type", "application/json; charset=utf-8")
-            ;
+                    .body("firstname", notNullValue())
+                    .body("lastname", notNullValue())
+                    .body("totalprice", notNullValue())
+                    .body("depositpaid", notNullValue())
+                    .body("bookingdates", notNullValue());
         }catch (Exception e){
             Assertions.fail(e.getMessage());
             LOGGER.error(e.getMessage(),e);
         }
     }
+
+
 }
-
-
