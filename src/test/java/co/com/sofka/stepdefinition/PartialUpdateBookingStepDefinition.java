@@ -4,6 +4,7 @@ import co.com.sofka.setup.Setup;
 import io.cucumber.java.es.Cuando;
 import io.cucumber.java.es.Dado;
 import io.cucumber.java.es.Entonces;
+
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
@@ -11,63 +12,63 @@ import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.hasLength;
+import static org.hamcrest.CoreMatchers.equalTo;
 
-public class CreateTokenStepDefinition extends Setup {
 
-    private static final Logger LOGGER = Logger.getLogger(CreateTokenStepDefinition.class);
+public class PartialUpdateBookingStepDefinition extends Setup {
+
+    private static final Logger LOGGER = Logger.getLogger(PartialUpdateBookingStepDefinition.class);
+
     private RequestSpecification request;
 
     private Response response;
 
-    @Dado("que el usuario posee un username: {string} y password: {string}")
-    public void queElUsuarioUsernameYPassword(String username, String password) {
-        try {
+
+    @Dado("que el usuario posee un token por estar registrado")// y la info a actualizar
+    public void queElUsuarioPoseeUnTokenPorEstarRegistrado() {
+        try{
             generalSetUp();
             request = given()
+                    .header("Authorization", "Basic YWRtaW46cGFzc3dvcmQxMjM=")
                     .log()
                     .all()
                     .body("{\n" +
-                    "   \"username\": \"admin\", \n" +
-                    "   \"password\": \"password123\"\n"+
-                    "}");
-        } catch (Exception e) {
+                            "   \"firstname\": \"sebas\", \n" +
+                            "   \"lastname\": \"torres\"\n"+
+                            "}");
+        }catch (Exception e){
             Assertions.fail(e.getMessage());
             LOGGER.error(e.getMessage(),e);
         }
     }
 
-    @Cuando("el usuario realiza una peticion para crear un token de autorizacion")
-    public void elUsuarioRealizaUnaPeticionParaCrearUnTokenDeAutorizacion() {
+    @Cuando("el usuario actualiza los datos de la reserva")
+    public void elUsuarioActualizaLosDatosDeLaReserva() {
         try{
             response = request.when()
                     .log()
                     .all()
-                    .post("/auth");
-        } catch (Exception e){
+                    .patch("/booking/9");
+        }catch (Exception e){
             Assertions.fail(e.getMessage());
             LOGGER.error(e.getMessage(),e);
         }
 
     }
 
-    @Entonces("el sistema responde con un status code exitoso y un token de autorizacion")
-    public void elSistemaRespondeConUnStatusCodeExitosoYUnTokenDeAutorizacion() {
+    @Entonces("en la respuesta del sistema se observa los datos que fueron actualizados")
+    public void enLaRespuestaDelSistemaSeObservaLosDatosQueFueronActualizados() {
         try{
             response
                     .then()
                     .log()
                     .all()
                     .statusCode(HttpStatus.SC_OK)
-                    .body("token",hasLength(15))
-                    .body("token",notNullValue())
-                    .header("Content-type", "application/json; charset=utf-8");
+                    .body("firstname",equalTo("sebas"))
+                    .body("lastname",equalTo("torres"));
         }catch (Exception e){
             Assertions.fail(e.getMessage());
             LOGGER.error(e.getMessage(),e);
         }
     }
 }
-
-
